@@ -58,6 +58,18 @@ lemma aux(a: array<int>, c: array<int>, i: int, j: int)
     requires is_prefix_sum_for(a, c)
     decreases j - i
     ensures forall k: int :: i <= k <= j ==> sum(a, i, k) + sum(a, k, j) == c[k] - c[i] + c[j] - c[k] //sum(a, i, j) == c[j] - c[i]
+{
+    // if (i == j){
+    //     assert forall k: int :: i <= k <= j ==> sum(a, i, k) + sum(a, k, j) == c[k] - c[i] + c[j] - c[k];
+    // } else{ 
+    //     var m := (i + j) / 2;
+    //     assert i <= m < j;
+    //     aux(a, c, i, m);
+    //     aux(a, c, m, j);
+    //     assert forall k: int :: i <= k <= j ==> sum(a, i, k) + sum(a, k, j) == c[k] - c[i] + c[j] - c[k];
+    // }
+}
+
 
 method queryFast(a: array<int>, c: array<int>, i: int, j: int) returns (r: int)
     requires a.Length + 1 == c.Length && c[0] == 0
@@ -67,4 +79,16 @@ method queryFast(a: array<int>, c: array<int>, i: int, j: int) returns (r: int)
 {   
     aux(a, c, i, j);
     r := c[j] - c[i];    
+}
+
+
+
+
+method Main()
+{
+    var x := new int[10];
+    x[0], x[1], x[2], x[3] := 2, 2, 1, 5;
+    var r := sum(x, 0, x.Length);
+    print r == 10;
+
 }
