@@ -14,32 +14,32 @@ function length<T>(l: List<T>): nat
   case Cons(_, t) => 1 + length(t)
 }
 
-function mem<T(==)> (x: T, n: nat, l: List<T>) : bool
-  requires n <= length(l)
+predicate mem<T(==)> (l: List<T>, x: T)
 {
   match l
   case Nil => false
-  case Cons(y, t) =>
-    if(n == 0) then
-      if (y == x) then true
-      else
-        false
-    else
-      mem(x,n-1,t)
+  case Cons(h, t) => if(h == x) then true else mem(t, x)
+}
+
+function at<T>(l: List<T>, i: nat): T
+  requires i < length(l)
+{
+  if i == 0 then l.head else at(l.tail, i - 1)
 }
 
 method from_array<T>(a: array<T>) returns (l: List<T>)
   requires a.Length >= 0
   ensures length(l) == a.Length
-  ensures forall i: int :: 0 <= i < a.Length ==> mem(a[i],i, l)
-
+  ensures forall i: int :: 0 <= i < length(l) ==> at(l, i) == a[i]
+  ensures forall x :: mem(l, x) ==> exists i: int :: 0 <= i < length(l) && a[i] == x
 {
   l := Nil;
   var i: int := a.Length - 1;
   while(i >= 0)
     invariant -1 <= i <= a.Length - 1
     invariant length(l) == a.Length - 1 - i
-    invariant forall j: int :: i < j < a.Length ==> mem(a[j], j - i - 1, l)
+    invariant forall j: int :: i < j < a.Length ==> at(l,j-i-1) == a[j]
+    invariant forall x :: mem(l, x) ==> exists k: int :: i < k < a.Length && a[k] == x
   {
     l := Cons(a[i], l);
     i := i-1;
